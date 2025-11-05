@@ -145,7 +145,7 @@ export default function CoffeeTimer() {
                 ))}
             </div>
             {mode !== 'quick' && (
-                <>
+                <div className="minutos-totales-row">
                     <input
                         type="number"
                         min={mode === 'pomodoro' ? 25 : 1}
@@ -154,38 +154,44 @@ export default function CoffeeTimer() {
                         value={totalMinutes}
                         disabled={running}
                         onChange={e => setTotalMinutes(mode === 'pomodoro' ? validPomodoroTotal(e.target.value) : Math.max(1, e.target.value))}
-                    /> minutos totales
-                </>
+                    />
+                    <span className="minutos-txt">minutos totales</span>
+                </div>
             )}
             {mode === 'custom' && (
-                <>
-                    <br />
-                    Trabajo:
-                    <input
-                        type="number"
-                        min={1}
-                        max={120}
-                        step="1"
-                        className="input-minutes"
-                        value={minutes}
-                        disabled={running}
-                        onChange={e => setMinutes(Math.max(1, e.target.value))}
-                        style={{ width: 50 }}
-                    /> min
-                    Descanso:
-                    <input
-                        type="number"
-                        min={1}
-                        max={120}
-                        step="1"
-                        className="input-minutes"
-                        value={breakMinutes}
-                        disabled={running}
-                        onChange={e => setBreakMinutes(Math.max(1, e.target.value))}
-                        style={{ width: 50 }}
-                    /> min
-                </>
+                <div className="input-row">
+                    <div className="input-block">
+                        <label className="input-label" htmlFor="trabajo">Trabajo:</label>
+                        <input
+                            id="trabajo"
+                            type="number"
+                            min={1}
+                            max={120}
+                            className="input-minutes"
+                            value={minutes}
+                            disabled={running}
+                            onChange={e => setMinutes(Math.max(1, e.target.value))}
+                        />
+                        <span className="input-units">min</span>
+                    </div>
+                    <div className="input-block">
+                        <label className="input-label" htmlFor="descanso">Descanso:</label>
+                        <input
+                            id="descanso"
+                            type="number"
+                            min={1}
+                            max={120}
+                            className="input-minutes"
+                            value={breakMinutes}
+                            disabled={running}
+                            onChange={e => setBreakMinutes(Math.max(1, e.target.value))}
+                        />
+                        <span className="input-units">min</span>
+                    </div>
+                </div>
             )}
+
+
             <div className="session-info">
                 Sesión actual: {sessionType === 'work' ? 'Trabajo' : 'Descanso'}
                 {(mode === 'pomodoro' || mode === 'custom') && ` (${cyclesLeft} ciclo(s) restantes)`}
@@ -237,12 +243,10 @@ export default function CoffeeTimer() {
             <div className="timer">
                 {Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, "0")}
             </div>
-            <button className="btn-timer" onClick={() => setRunning(!running)}>
-                {running ? "Pausar" : "Iniciar"}
-            </button>
-            <button className="btn-timer" onClick={reset}>
-                Resetear
-            </button>
+            <div className="timer-btn-row">
+                <button className="btn-timer">{running ? "Pausar" : "Iniciar"}</button>
+                <button className="btn-timer">Resetear</button>
+            </div>
         </div>
     );
 }
