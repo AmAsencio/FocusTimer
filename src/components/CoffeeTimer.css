@@ -191,6 +191,40 @@ body {
     transform: scale(1.02) translateY(-2px);
 }
 
+.transition-message {
+    text-align: center;
+    font-size: 1.44rem;
+    font-weight: 700;
+    margin: 16px auto 8px auto;
+    color: #fee889;
+    text-shadow: 0 2px 10px #342f15;
+    opacity: 1;
+    animation: fadeDropSmooth 2.4s forwards;
+}
+
+@keyframes fadeDropSmooth {
+    0% {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+
+    10% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    83% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(26px);
+    }
+}
+
+
+
 
 
 

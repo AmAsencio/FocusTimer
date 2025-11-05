@@ -20,6 +20,7 @@ export default function CoffeeTimer() {
     const [secondsLeft, setSecondsLeft] = useState(minutes * 60);
     const [cyclesLeft, setCyclesLeft] = useState(Math.floor(totalMinutes / (25 + 5)));
     const [running, setRunning] = useState(false);
+    const [transitionMessage, setTransitionMessage] = useState('');
     const interval = useRef();
 
     // Input bounds
@@ -73,16 +74,21 @@ export default function CoffeeTimer() {
             return () => clearInterval(interval.current);
         }
         clearInterval(interval.current);
+
+        // Aviso de cambio de sesión
         if (running && secondsLeft === 0) {
-            // Pomodoro cycles
             if (mode === 'pomodoro' && cyclesLeft > 1) {
                 if (sessionType === 'work') {
                     setSessionType('break');
                     setSecondsLeft(5 * 60);
+                    setTransitionMessage('¡Descanso!');
+                    setTimeout(() => setTransitionMessage(''), 2000);
                 } else {
                     setSessionType('work');
                     setCyclesLeft(c => c - 1);
                     setSecondsLeft(25 * 60);
+                    setTransitionMessage('¡Vuelve el foco!');
+                    setTimeout(() => setTransitionMessage(''), 2000);
                 }
             } else if (mode === 'pomodoro' && cyclesLeft === 1) {
                 setRunning(false);
@@ -92,13 +98,16 @@ export default function CoffeeTimer() {
                 if (sessionType === 'work') {
                     setSessionType('break');
                     setSecondsLeft(roundToInt(realBreak * 60));
+                    setTransitionMessage('¡Descanso!');
+                    setTimeout(() => setTransitionMessage(''), 2000);
                 } else {
                     setSessionType('work');
                     setCyclesLeft(c => c - 1);
                     setSecondsLeft(roundToInt(realMinutes * 60));
+                    setTransitionMessage('¡Vuelve el foco!');
+                    setTimeout(() => setTransitionMessage(''), 2000);
                 }
             }
-            // End
             else {
                 setRunning(false);
             }
@@ -190,12 +199,14 @@ export default function CoffeeTimer() {
                     </div>
                 </div>
             )}
-
-
             <div className="session-info">
                 Sesión actual: {sessionType === 'work' ? 'Trabajo' : 'Descanso'}
                 {(mode === 'pomodoro' || mode === 'custom') && ` (${cyclesLeft} ciclo(s) restantes)`}
             </div>
+            {/* AVISO DE TRANSICIÓN */}
+            {transitionMessage && (
+                <div className="transition-message">{transitionMessage}</div>
+            )}
             <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: 180 }}>
                 <svg
                     viewBox="0 0 56 75"
@@ -211,7 +222,7 @@ export default function CoffeeTimer() {
                     <rect x="9" y="17" width="37" height="2" fill="#bedbf1" />
                     <rect x="11" y="19" width="32" height="2" fill="#7eb6e7" />
                     {/* Vaso */}
-                    <rect x="11" y="23" width="34" height="45" fill="#fde3bc" stroke="#28283a" strokeWidth="2" />
+                    <rect x="11" y="23" width="34" height="45" fill="#f8e8d0ff" stroke="#28283a" strokeWidth="2" />
                     {/* Bubble tea animado */}
                     <rect
                         x="13"
@@ -244,8 +255,12 @@ export default function CoffeeTimer() {
                 {Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, "0")}
             </div>
             <div className="timer-btn-row">
-                <button className="btn-timer">{running ? "Pausar" : "Iniciar"}</button>
-                <button className="btn-timer">Resetear</button>
+                <button className="btn-timer" onClick={() => setRunning(!running)}>
+                    {running ? "Pausar" : "Iniciar"}
+                </button>
+                <button className="btn-timer" onClick={reset}>
+                    Resetear
+                </button>
             </div>
         </div>
     );
