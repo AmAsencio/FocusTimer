@@ -1,70 +1,68 @@
-# Getting Started with Create React App
+# Focus Coffee Timer
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Una aplicación web mínima desarrollada en React que funciona como temporizador para mantener el foco, con una animación de una taza de café cuyo nivel baja conforme pasa el tiempo.
 
-## Available Scripts
+## Características
 
-In the project directory, you can run:
+- Temporizador configurable (por defecto 25 minutos)
+- Animación SVG simple y elegante del café reduciéndose
+- Controles para iniciar, pausar y resetear el temporizador
+- Código limpio y fácil de entender para aprendizaje o ampliación
 
-### `npm start`
+## Tecnologías utilizadas
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- React 18
+- HTML5 y CSS3
+- SVG para la animación dinámica del café
+- JavaScript (Hooks: useState, useEffect)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Instalación rápida
 
-### `npm test`
+1. Clona el repositorio:
+   cd focus-coffee-timer
+   npm instal
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+2. Instala dependencias:
+   cd focus-coffee-timer
+   npm install
+3. Ejecuta la app en modo desarrollo:
+   npm start
+4. Abre en tu navegador
+   [http://localhost:3000](http://localhost:3000)
 
-### `npm run build`
+## Uso
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- Haz clic en "Iniciar" para comenzar el temporizador.
+- "Pausar" detiene el conteo.
+- "Resetear" vuelve al tiempo inicial.
+- Observa cómo el nivel del café baja durante la cuenta regresiva, proporcionando una referencia visual de tu progreso.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Estructura de archivos
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+focus-coffee-timer/
+├─ public/
+├─ src/
+│ ├─ CoffeeTimer.jsx # Componente principal del timer y animación
+│ ├─ App.js # Componente raíz que renderiza CoffeeTimer
+│ ├─ index.js # Main entry point
+├─ package.json
+├─ README.md
 
-### `npm run eject`
+## Roadmap
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- Añadir configurador de tiempos personalizables
+- Mejorar animación con transiciones más suaves y efectos
+- Deploy en GitHub Pages o Netlify para acceso online gratuito
+- Agregar sonidos y notificaciones de fin de sesión
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Autor
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Alejandro Asencio Montes - [aasenciomontesgmail.com](mailto:aasenciomntes@gmail.com)
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Licencia
 
-## Learn More
+Este proyecto está bajo la licencia MIT - consulta el archivo LICENSE para más detalles.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+---
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+¡Gracias por probar Focus Coffee Timer! Si tienes sugerencias o quieres colaborar, abre un issue o pull request.
