@@ -21,13 +21,12 @@ export default function CoffeeTimer() {
     const [cyclesLeft, setCyclesLeft] = useState(Math.floor(totalMinutes / (25 + 5)));
     const [running, setRunning] = useState(false);
     const [transitionMessage, setTransitionMessage] = useState('');
+    const [endModal, setEndModal] = useState(false);
     const interval = useRef();
 
-    // Input bounds
     const realMinutes = Math.max(1, minutes);
     const realBreak = Math.max(1, breakMinutes);
 
-    // Calculate cycles for custom mode
     function calculateCustomCycles(tot, work, rest) {
         if (work < 1) work = 1;
         if (rest < 1) rest = 1;
@@ -35,12 +34,10 @@ export default function CoffeeTimer() {
         return Math.max(1, cycles);
     }
 
-    // Input restrictions for Pomodoro
     function validPomodoroTotal(total) {
         return Math.max(25, roundToInt(total));
     }
 
-    // Initial setup
     useEffect(() => {
         if (mode === 'pomodoro') {
             setMinutes(25);
@@ -65,7 +62,6 @@ export default function CoffeeTimer() {
         // eslint-disable-next-line
     }, [mode, totalMinutes, minutes, breakMinutes]);
 
-    // Timer/alternation logic
     useEffect(() => {
         if (running && secondsLeft > 0) {
             interval.current = setInterval(() => {
@@ -75,38 +71,42 @@ export default function CoffeeTimer() {
         }
         clearInterval(interval.current);
 
-        // Aviso de cambio de sesión
         if (running && secondsLeft === 0) {
             if (mode === 'pomodoro' && cyclesLeft > 1) {
                 if (sessionType === 'work') {
                     setSessionType('break');
                     setSecondsLeft(5 * 60);
                     setTransitionMessage('¡Descanso!');
-                    setTimeout(() => setTransitionMessage(''), 2000);
+                    setTimeout(() => setTransitionMessage(''), 2400);
                 } else {
                     setSessionType('work');
                     setCyclesLeft(c => c - 1);
                     setSecondsLeft(25 * 60);
                     setTransitionMessage('¡Vuelve el foco!');
-                    setTimeout(() => setTransitionMessage(''), 2000);
+                    setTimeout(() => setTransitionMessage(''), 2400);
                 }
             } else if (mode === 'pomodoro' && cyclesLeft === 1) {
                 setRunning(false);
+                setEndModal(true);
+                setTimeout(() => setEndModal(false), 4500);
             }
-            // Custom mode cycles
             else if (mode === 'custom' && cyclesLeft > 1) {
                 if (sessionType === 'work') {
                     setSessionType('break');
                     setSecondsLeft(roundToInt(realBreak * 60));
                     setTransitionMessage('¡Descanso!');
-                    setTimeout(() => setTransitionMessage(''), 2000);
+                    setTimeout(() => setTransitionMessage(''), 2400);
                 } else {
                     setSessionType('work');
                     setCyclesLeft(c => c - 1);
                     setSecondsLeft(roundToInt(realMinutes * 60));
                     setTransitionMessage('¡Vuelve el foco!');
-                    setTimeout(() => setTransitionMessage(''), 2000);
+                    setTimeout(() => setTransitionMessage(''), 2400);
                 }
+            } else if (mode === 'custom' && cyclesLeft === 1) {
+                setRunning(false);
+                setEndModal(true);
+                setTimeout(() => setEndModal(false), 4500);
             }
             else {
                 setRunning(false);
@@ -140,18 +140,20 @@ export default function CoffeeTimer() {
     return (
         <div className="focus-card">
             <div className="focus-title">Focus Timer</div>
-            <div className="focus-label">Modo de enfoque:</div>
-            <div className="mode-row">
-                {MODES.map(m => (
-                    <button
-                        key={m.key}
-                        className={`option-btn${mode === m.key ? ' selected' : ''}`}
-                        onClick={() => !running && setMode(m.key)}
-                        disabled={running}
-                    >
-                        {m.label}
-                    </button>
-                ))}
+            <div className='focus-box'>
+                <div className="focus-label">Modo de enfoque:</div>
+                <div className="mode-row">
+                    {MODES.map(m => (
+                        <button
+                            key={m.key}
+                            className={`option-btn${mode === m.key ? ' selected' : ''}`}
+                            onClick={() => !running && setMode(m.key)}
+                            disabled={running}
+                        >
+                            {m.label}
+                        </button>
+                    ))}
+                </div>
             </div>
             {mode !== 'quick' && (
                 <div className="minutos-totales-row">
@@ -203,9 +205,19 @@ export default function CoffeeTimer() {
                 Sesión actual: {sessionType === 'work' ? 'Trabajo' : 'Descanso'}
                 {(mode === 'pomodoro' || mode === 'custom') && ` (${cyclesLeft} ciclo(s) restantes)`}
             </div>
-            {/* AVISO DE TRANSICIÓN */}
             {transitionMessage && (
                 <div className="transition-message">{transitionMessage}</div>
+            )}
+            {endModal && (
+                <div className="focus-modal-bg">
+                    <div className="focus-modal">
+                        <h2>¡Sesión finalizada!</h2>
+                        <p>¡Buen trabajo! Has completado todos los ciclos.</p>
+                        <button className="modal-btn" onClick={() => setEndModal(false)}>
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
             )}
             <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: 180 }}>
                 <svg
@@ -222,14 +234,14 @@ export default function CoffeeTimer() {
                     <rect x="9" y="17" width="37" height="2" fill="#bedbf1" />
                     <rect x="11" y="19" width="32" height="2" fill="#7eb6e7" />
                     {/* Vaso */}
-                    <rect x="11" y="23" width="34" height="45" fill="#f8e8d0ff" stroke="#28283a" strokeWidth="2" />
+                    <rect x="11" y="23" width="34" height="45" fill="#fde3bc" stroke="#28283a" strokeWidth="2" />
                     {/* Bubble tea animado */}
                     <rect
                         x="13"
                         y={65 - Math.round(40 * coffeeLevel)}
                         width="30"
                         height={Math.round(40 * coffeeLevel)}
-                        fill="#f8cf98"
+                        fill="#ecb772ff"
                         stroke="#d9a66a"
                         strokeWidth="1.4"
                         style={{ transition: "all 0.42s cubic-bezier(.66,0,.27,1)", imageRendering: "pixelated" }}
