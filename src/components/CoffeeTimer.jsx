@@ -212,7 +212,7 @@ export default function CoffeeTimer() {
                 <div className="focus-modal-bg">
                     <div className="focus-modal">
                         <h2>¡Sesión finalizada!</h2>
-                        <p>¡Buen trabajo! Has completado todos los ciclos.</p>
+                        <p>¡Buen trabajo! Has completado tu proposito.</p>
                         <button className="modal-btn" onClick={() => setEndModal(false)}>
                             Cerrar
                         </button>
