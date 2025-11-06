@@ -49,9 +49,10 @@ export default function CoffeeTimer() {
             setSecondsLeft(25 * 60);
         }
         if (mode === 'quick') {
-            setMinutes(Math.max(1, totalMinutes));
+            setTotalMinutes(60);
+            setMinutes(60);
             setSessionType('work');
-            setSecondsLeft(roundToInt(totalMinutes * 60));
+            setSecondsLeft(60 * 60);
         }
         if (mode === 'custom') {
             setSessionType('work');
@@ -164,7 +165,22 @@ export default function CoffeeTimer() {
                         className="input-minutes"
                         value={totalMinutes}
                         disabled={running}
-                        onChange={e => setTotalMinutes(mode === 'pomodoro' ? validPomodoroTotal(e.target.value) : Math.max(1, e.target.value))}
+                        onChange={e => {
+                            const val = e.target.value;
+                            if (val === '') {
+                                setTotalMinutes('');
+                            } else if (mode === 'pomodoro') {
+                                setTotalMinutes(validPomodoroTotal(val));
+                            } else {
+                                setTotalMinutes(val);
+                            }
+                        }}
+                        onBlur={e => {
+                            const val = e.target.value;
+                            if (val === '' || val < 1) {
+                                setTotalMinutes(mode === 'pomodoro' ? 25 : 1);
+                            }
+                        }}
                     />
                     <span className="minutos-txt">minutos totales</span>
                 </div>
@@ -181,7 +197,16 @@ export default function CoffeeTimer() {
                             className="input-minutes"
                             value={minutes}
                             disabled={running}
-                            onChange={e => setMinutes(Math.max(1, e.target.value))}
+                            onChange={e => {
+                                const val = e.target.value;
+                                setMinutes(val === '' ? '' : val);
+                            }}
+                            onBlur={e => {
+                                const val = e.target.value;
+                                if (val === '' || val < 1) {
+                                    setMinutes(1);
+                                }
+                            }}
                         />
                         <span className="input-units">min</span>
                     </div>
@@ -195,7 +220,16 @@ export default function CoffeeTimer() {
                             className="input-minutes"
                             value={breakMinutes}
                             disabled={running}
-                            onChange={e => setBreakMinutes(Math.max(1, e.target.value))}
+                            onChange={e => {
+                                const val = e.target.value;
+                                setBreakMinutes(val === '' ? '' : val);
+                            }}
+                            onBlur={e => {
+                                const val = e.target.value;
+                                if (val === '' || val < 1) {
+                                    setBreakMinutes(1);
+                                }
+                            }}
                         />
                         <span className="input-units">min</span>
                     </div>
