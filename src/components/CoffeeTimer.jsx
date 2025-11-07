@@ -20,7 +20,6 @@ export default function CoffeeTimer() {
     const [secondsLeft, setSecondsLeft] = useState(minutes * 60);
     const [cyclesLeft, setCyclesLeft] = useState(0);
 
-
     const [running, setRunning] = useState(false);
     const [transitionMessage, setTransitionMessage] = useState('');
     const [endModal, setEndModal] = useState(false);
@@ -45,8 +44,10 @@ export default function CoffeeTimer() {
             setMinutes(25);
             setBreakMinutes(5);
             const correctedTotal = validPomodoroTotal(totalMinutes);
-            setTotalMinutes(correctedTotal);
-            setCyclesLeft(Math.floor(correctedTotal / 30));
+            if (totalMinutes !== correctedTotal && totalMinutes !== '') {
+                setTotalMinutes(correctedTotal);
+            }
+            setCyclesLeft(Math.floor((typeof totalMinutes === 'number' ? totalMinutes : correctedTotal) / 30));
             setSessionType('work');
             setSecondsLeft(25 * 60);
         }
@@ -58,12 +59,26 @@ export default function CoffeeTimer() {
         }
         if (mode === 'custom') {
             setSessionType('work');
-            setCyclesLeft(calculateCustomCycles(totalMinutes, minutes, breakMinutes));
+            const validTotal = totalMinutes === '' ? 1 : totalMinutes;
+            setCyclesLeft(calculateCustomCycles(validTotal, minutes, breakMinutes));
             setSecondsLeft(roundToInt(minutes * 60));
         }
         setRunning(false);
         // eslint-disable-next-line
-    }, [mode, totalMinutes, minutes, breakMinutes]);
+    }, [mode]);
+
+    // Actualizar ciclos cuando cambian los valores
+    useEffect(() => {
+        if (mode === 'pomodoro' && !running) {
+            const validTotal = typeof totalMinutes === 'number' && totalMinutes !== '' ? totalMinutes : 60;
+            setCyclesLeft(Math.floor(validTotal / 30));
+        }
+        if (mode === 'custom' && !running) {
+            const validTotal = totalMinutes === '' ? 1 : totalMinutes;
+            setCyclesLeft(calculateCustomCycles(validTotal, minutes, breakMinutes));
+        }
+        // eslint-disable-next-line
+    }, [totalMinutes, minutes, breakMinutes]);
 
     useEffect(() => {
         if (running && secondsLeft > 0) {
@@ -117,6 +132,19 @@ export default function CoffeeTimer() {
         }
     }, [running, secondsLeft, sessionType, cyclesLeft, mode, realMinutes, realBreak]);
 
+    useEffect(() => {
+        if (!running) {
+            if (mode === "custom") {
+                setSecondsLeft(minutes * 60);
+            } else if (mode === "pomodoro") {
+                setSecondsLeft(25 * 60);
+            } else if (mode === "quick") {
+                setSecondsLeft(totalMinutes * 60);
+            }
+        }
+    }, [minutes, mode, totalMinutes, running]);
+
+
     const reset = () => {
         setRunning(false);
         if (mode === 'pomodoro') {
@@ -135,10 +163,25 @@ export default function CoffeeTimer() {
         }
     };
 
-    const sessionDuration = sessionType === 'work' ? realMinutes : realBreak;
-    const coffeeLevel = sessionType === 'work'
-        ? secondsLeft / (sessionDuration * 60)
-        : 1 - secondsLeft / (sessionDuration * 60);
+    const getSessionDuration = () => {
+        if (mode === 'pomodoro') {
+            return sessionType === 'work' ? 25 : 5;
+        }
+        if (mode === 'quick') {
+            return typeof totalMinutes === 'number' && totalMinutes !== '' ? totalMinutes : 60;
+        }
+        return sessionType === 'work' ? realMinutes : realBreak;
+    };
+
+    const sessionDuration = getSessionDuration();
+
+    // Asegurar que coffeeLevel esté entre 0 y 1
+    let coffeeLevel;
+    if (sessionType === 'work') {
+        coffeeLevel = Math.min(1, Math.max(0, secondsLeft / (sessionDuration * 60)));
+    } else {
+        coffeeLevel = Math.min(1, Math.max(0, 1 - secondsLeft / (sessionDuration * 60)));
+    }
 
     return (
         <div className="focus-card">
@@ -158,6 +201,7 @@ export default function CoffeeTimer() {
                     ))}
                 </div>
             </div>
+
             {mode !== 'quick' && (
                 <div className="minutos-totales-row">
                     <input
@@ -171,16 +215,16 @@ export default function CoffeeTimer() {
                             const val = e.target.value;
                             if (val === '') {
                                 setTotalMinutes('');
-                            } else if (mode === 'pomodoro') {
-                                setTotalMinutes(validPomodoroTotal(val));
                             } else {
                                 setTotalMinutes(val);
                             }
                         }}
                         onBlur={e => {
                             const val = e.target.value;
-                            if (val === '' || val < 1) {
-                                setTotalMinutes(mode === 'pomodoro' ? 25 : 1);
+                            if (mode === 'pomodoro') {
+                                setTotalMinutes(validPomodoroTotal(val === '' || val < 25 ? 25 : val));
+                            } else if (val === '' || val < 1) {
+                                setTotalMinutes(1);
                             }
                         }}
                     />
@@ -202,16 +246,10 @@ export default function CoffeeTimer() {
                             onChange={e => {
                                 const val = e.target.value ? Number(e.target.value) : 1;
                                 setMinutes(val);
-                                if (mode === "custom") {
-                                    setCyclesLeft(calculateCustomCycles(totalMinutes, val, breakMinutes));
-                                }
                             }}
                             onBlur={e => {
                                 const val = e.target.value < 1 ? 1 : Number(e.target.value);
                                 setMinutes(val);
-                                if (mode === "custom") {
-                                    setCyclesLeft(calculateCustomCycles(totalMinutes, val, breakMinutes));
-                                }
                             }}
                         />
                         <span className="input-units">min</span>
@@ -229,16 +267,10 @@ export default function CoffeeTimer() {
                             onChange={e => {
                                 const val = e.target.value ? Number(e.target.value) : 1;
                                 setBreakMinutes(val);
-                                if (mode === "custom") {
-                                    setCyclesLeft(calculateCustomCycles(totalMinutes, minutes, val));
-                                }
                             }}
                             onBlur={e => {
                                 const val = e.target.value < 1 ? 1 : Number(e.target.value);
                                 setBreakMinutes(val);
-                                if (mode === "custom") {
-                                    setCyclesLeft(calculateCustomCycles(totalMinutes, minutes, val));
-                                }
                             }}
                         />
                         <span className="input-units">min</span>
@@ -256,7 +288,7 @@ export default function CoffeeTimer() {
                 <div className="focus-modal-bg">
                     <div className="focus-modal">
                         <h2>¡Sesión finalizada!</h2>
-                        <p>¡Buen trabajo! Has completado tu proposito.</p>
+                        <p>¡Buen trabajo! Has completado tu propósito.</p>
                         <button className="modal-btn" onClick={() => setEndModal(false)}>
                             Cerrar
                         </button>
@@ -290,7 +322,7 @@ export default function CoffeeTimer() {
                         strokeWidth="1.4"
                         style={{ transition: "all 0.42s cubic-bezier(.66,0,.27,1)", imageRendering: "pixelated" }}
                     />
-                    {/* Burbujas boba: redondas, agrupadas, con brillo pixel en la esquina superior izquierda */}
+                    {/* Burbujas boba */}
                     <circle cx="17.5" cy="63.8" r="3.1" fill="#53343e" stroke="#3b202a" strokeWidth="1.1" />
                     <ellipse cx="17.1" cy="62.7" rx="0.8" ry="1.2" fill="#fff" opacity="0.22" />
                     <circle cx="24.5" cy="65.1" r="2.4" fill="#795a4a" stroke="#3b202a" strokeWidth="1" />
@@ -301,9 +333,7 @@ export default function CoffeeTimer() {
                     <ellipse cx="39.2" cy="65.1" rx="0.8" ry="1.2" fill="#fff" opacity="0.22" />
                     <circle cx="39.1" cy="66" r="2.5" fill="#35202d" stroke="#3b202a" strokeWidth="1" />
                     <ellipse cx="38.7" cy="65.2" rx="0.6" ry="0.7" fill="#fff" opacity="0.15" />
-
-
-                    {/* Reflejo/sombra cute */}
+                    {/* Reflejo */}
                     <rect x="14" y="30" width="7" height="4" fill="#fff" opacity="0.16" />
                 </svg>
             </div>
