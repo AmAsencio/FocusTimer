@@ -18,7 +18,9 @@ export default function CoffeeTimer() {
     const [breakMinutes, setBreakMinutes] = useState(5);
     const [sessionType, setSessionType] = useState('work');
     const [secondsLeft, setSecondsLeft] = useState(minutes * 60);
-    const [cyclesLeft, setCyclesLeft] = useState(Math.floor(totalMinutes / (25 + 5)));
+    const [cyclesLeft, setCyclesLeft] = useState(0);
+
+
     const [running, setRunning] = useState(false);
     const [transitionMessage, setTransitionMessage] = useState('');
     const [endModal, setEndModal] = useState(false);
@@ -161,7 +163,7 @@ export default function CoffeeTimer() {
                     <input
                         type="number"
                         min={mode === 'pomodoro' ? 25 : 1}
-                        max={240}
+                        max={480}
                         className="input-minutes"
                         value={totalMinutes}
                         disabled={running}
@@ -198,13 +200,17 @@ export default function CoffeeTimer() {
                             value={minutes}
                             disabled={running}
                             onChange={e => {
-                                const val = e.target.value;
-                                setMinutes(val === '' ? '' : val);
+                                const val = e.target.value ? Number(e.target.value) : 1;
+                                setMinutes(val);
+                                if (mode === "custom") {
+                                    setCyclesLeft(calculateCustomCycles(totalMinutes, val, breakMinutes));
+                                }
                             }}
                             onBlur={e => {
-                                const val = e.target.value;
-                                if (val === '' || val < 1) {
-                                    setMinutes(1);
+                                const val = e.target.value < 1 ? 1 : Number(e.target.value);
+                                setMinutes(val);
+                                if (mode === "custom") {
+                                    setCyclesLeft(calculateCustomCycles(totalMinutes, val, breakMinutes));
                                 }
                             }}
                         />
@@ -221,13 +227,17 @@ export default function CoffeeTimer() {
                             value={breakMinutes}
                             disabled={running}
                             onChange={e => {
-                                const val = e.target.value;
-                                setBreakMinutes(val === '' ? '' : val);
+                                const val = e.target.value ? Number(e.target.value) : 1;
+                                setBreakMinutes(val);
+                                if (mode === "custom") {
+                                    setCyclesLeft(calculateCustomCycles(totalMinutes, minutes, val));
+                                }
                             }}
                             onBlur={e => {
-                                const val = e.target.value;
-                                if (val === '' || val < 1) {
-                                    setBreakMinutes(1);
+                                const val = e.target.value < 1 ? 1 : Number(e.target.value);
+                                setBreakMinutes(val);
+                                if (mode === "custom") {
+                                    setCyclesLeft(calculateCustomCycles(totalMinutes, minutes, val));
                                 }
                             }}
                         />
